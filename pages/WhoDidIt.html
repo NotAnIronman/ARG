@@ -71,7 +71,7 @@ const suspects = [
     "Unknown Entity"
 ];
 
-// persistent device id (IMPORTANT)
+// persistent device ID
 let userId = localStorage.getItem("userId");
 if (!userId) {
     userId = crypto.randomUUID();
@@ -81,10 +81,22 @@ if (!userId) {
 let userVote = localStorage.getItem("userVote");
 
 async function loadVotes() {
-    const res = await fetch(
-        `https://raw.githubusercontent.com/${owner}/${repo}/main/data/votes.json?t=${Date.now()}`
-    );
-    return await res.json();
+    try {
+        const res = await fetch(
+            `https://raw.githubusercontent.com/${owner}/${repo}/main/data/votes.json?t=${Date.now()}`
+        );
+
+        if (!res.ok) throw new Error("Failed to load votes");
+
+        return await res.json();
+    } catch (e) {
+        console.error(e);
+
+        return {
+            votes: Object.fromEntries(suspects.map(s => [s, 0])),
+            votesByUser: {}
+        };
+    }
 }
 
 async function sendVote(choice) {
@@ -110,11 +122,11 @@ async function vote(name) {
 
     await sendVote(name);
 
-    alert("Vote updated in investigation log.");
+    alert("Vote submitted to case database.");
 }
 
-function render(votesData) {
-    const votes = votesData.votes;
+function render(data) {
+    const votes = data?.votes || {};
 
     const container = document.getElementById("suspects");
     container.innerHTML = "";
@@ -135,7 +147,8 @@ function render(votesData) {
         container.appendChild(div);
     });
 }
-    
+
+// live polling (optional but good for ARG feel)
 let lastState = "";
 
 setInterval(async () => {
@@ -146,8 +159,9 @@ setInterval(async () => {
         lastState = str;
         render(data);
     }
-}, 5000);
-    
+}, 4000);
+
+// initial load
 loadVotes().then(render);
 </script>
 </body>
