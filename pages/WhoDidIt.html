@@ -57,6 +57,9 @@ h1 {
 </div>
 
 <script>
+const owner = "NotAnIronman";
+const repo = "ARG";
+
 const suspects = [
     "Gustau",
     "Nathan Bartholemew",
@@ -68,40 +71,40 @@ const suspects = [
     "Unknown Entity"
 ];
 
-const votesURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/data/votes.json";
-
 let userVote = localStorage.getItem("userVote");
 
 async function loadVotes() {
-    const res = await fetch(votesURL + "?t=" + Date.now()); // cache bust
+    const res = await fetch(
+        `https://raw.githubusercontent.com/${owner}/${repo}/main/data/votes.json?t=${Date.now()}`
+    );
     return await res.json();
 }
 
-function saveLocal(votes) {
-    localStorage.setItem("localVotes", JSON.stringify(votes));
-}
-
-function getLocalVotes() {
-    return JSON.parse(localStorage.getItem("localVotes"));
+async function sendVote(choice) {
+    await fetch(`https://api.github.com/repos/${owner}/${repo}/dispatches`, {
+        method: "POST",
+        headers: {
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            event_type: "cast_vote",
+            client_payload: {
+                choice
+            }
+        })
+    });
 }
 
 async function vote(name) {
-    let votes = await loadVotes();
-
-    // remove previous vote
-    if (userVote) {
-        votes[userVote] = Math.max(0, votes[userVote] - 1);
-    }
-
-    votes[name] = (votes[name] || 0) + 1;
+    if (userVote) return; // 1 vote per device
 
     userVote = name;
-    localStorage.setItem("userVote", userVote);
+    localStorage.setItem("userVote", name);
 
-    // NOTE: no server write yet
-    saveLocal(votes);
+    await sendVote(name);
 
-    render(votes);
+    alert("Vote recorded in case file.");
 }
 
 function render(votes) {
@@ -116,7 +119,7 @@ function render(votes) {
 
         div.innerHTML = `
             <strong>${name}</strong>
-            <div class="vote-count">Votes: ${votes[name] ?? 0}</div>
+            <div class="vote-count">Votes: ${votes[name] || 0}</div>
         `;
 
         div.onclick = () => vote(name);
@@ -125,9 +128,7 @@ function render(votes) {
     });
 }
 
-// init
 loadVotes().then(render);
 </script>
-
 </body>
 </html>
