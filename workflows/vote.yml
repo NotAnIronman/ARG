@@ -1,48 +1,28 @@
-name: Process Vote
+- name: Update votes
+  run: |
+    node -e "
+    const fs = require('fs');
 
-on:
-  repository_dispatch:
-    types: [cast_vote]
+    const file = 'data/votes.json';
+    const data = JSON.parse(fs.readFileSync(file));
 
-jobs:
-  update-votes:
-    runs-on: ubuntu-latest
+    const payload = process.env.PAYLOAD;
+    const { userId, choice } = JSON.parse(payload);
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+    // remove previous vote
+    const previous = data.votesByUser?.[userId];
 
-      - name: Update votes
-        run: |
-          node -e "
-          const fs = require('fs');
+    if (previous) {
+        data.votes[previous] = Math.max(0, (data.votes[previous] || 0) - 1);
+    }
 
-          const file = 'data/votes.json';
-          const data = JSON.parse(fs.readFileSync(file));
+    // assign new vote
+    if (!data.votesByUser) data.votesByUser = {};
 
-          const { userId, choice } = process.env;
+    data.votesByUser[userId] = choice;
+    data.votes[choice] = (data.votes[choice] || 0) + 1;
 
-          // remove previous vote if exists
-          const previous = data.votesByUser[userId];
-
-          if (previous) {
-              data.votes[previous] = Math.max(0, data.votes[previous] - 1);
-          }
-
-          // set new vote
-          data.votesByUser[userId] = choice;
-          data.votes[choice] = (data.votes[choice] || 0) + 1;
-
-          fs.writeFileSync(file, JSON.stringify(data, null, 2));
-          "
-        env:
-          userId: ${{ github.event.client_payload.userId }}
-          choice: ${{ github.event.client_payload.choice }}
-
-      - name: Commit changes
-        run: |
-          git config user.name "vote-bot"
-          git config user.email "actions@github.com"
-          git add data/votes.json
-          git commit -m "Vote update"
-          git push
+    fs.writeFileSync(file, JSON.stringify(data, null, 2));
+    "
+  env:
+    PAYLOAD: ${{ toJson(github.event.client_payload) }}
