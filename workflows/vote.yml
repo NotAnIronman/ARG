@@ -1,0 +1,40 @@
+name: Process Vote
+
+on:
+  repository_dispatch:
+    types: [cast_vote]
+
+jobs:
+  update-votes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Update votes
+        run: |
+          node -e "
+          const fs = require('fs');
+
+          const file = 'data/votes.json';
+          const votes = JSON.parse(fs.readFileSync(file));
+
+          const choice = process.env.CHOICE;
+
+          if (votes[choice] !== undefined) {
+              votes[choice] += 1;
+          }
+
+          fs.writeFileSync(file, JSON.stringify(votes, null, 2));
+          "
+        env:
+          CHOICE: ${{ github.event.client_payload.choice }}
+
+      - name: Commit changes
+        run: |
+          git config user.name "vote-bot"
+          git config user.email "actions@github.com"
+          git add data/votes.json
+          git commit -m "Vote update"
+          git push
