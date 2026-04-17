@@ -18,18 +18,26 @@ jobs:
           const fs = require('fs');
 
           const file = 'data/votes.json';
-          const votes = JSON.parse(fs.readFileSync(file));
+          const data = JSON.parse(fs.readFileSync(file));
 
-          const choice = process.env.CHOICE;
+          const { userId, choice } = process.env;
 
-          if (votes[choice] !== undefined) {
-              votes[choice] += 1;
+          // remove previous vote if exists
+          const previous = data.votesByUser[userId];
+
+          if (previous) {
+              data.votes[previous] = Math.max(0, data.votes[previous] - 1);
           }
 
-          fs.writeFileSync(file, JSON.stringify(votes, null, 2));
+          // set new vote
+          data.votesByUser[userId] = choice;
+          data.votes[choice] = (data.votes[choice] || 0) + 1;
+
+          fs.writeFileSync(file, JSON.stringify(data, null, 2));
           "
         env:
-          CHOICE: ${{ github.event.client_payload.choice }}
+          userId: ${{ github.event.client_payload.userId }}
+          choice: ${{ github.event.client_payload.choice }}
 
       - name: Commit changes
         run: |
