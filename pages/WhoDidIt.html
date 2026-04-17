@@ -136,10 +136,17 @@ function render(votesData) {
     });
 }
     
+let lastState = "";
+
 setInterval(async () => {
-    const updatedVotes = await loadVotes();
-    render(updatedVotes);
-}, 5000); // every 5 seconds
+    const data = await loadVotes();
+    const str = JSON.stringify(data);
+
+    if (str !== lastState) {
+        lastState = str;
+        render(data);
+    }
+}, 5000);
     
 loadVotes().then(render);
 </script>
