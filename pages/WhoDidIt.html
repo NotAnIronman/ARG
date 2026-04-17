@@ -74,10 +74,24 @@ const suspects = [
 let userVote = localStorage.getItem("userVote");
 
 async function loadVotes() {
-    const res = await fetch(
-        `https://raw.githubusercontent.com/${owner}/${repo}/main/data/votes.json?t=${Date.now()}`
-    );
-    return await res.json();
+    try {
+        const res = await fetch(
+            `https://raw.githubusercontent.com/${owner}/${repo}/main/data/votes.json?t=${Date.now()}`
+        );
+
+        if (!res.ok) {
+            throw new Error("Failed to load votes.json");
+        }
+
+        return await res.json();
+    } catch (err) {
+        console.error("Vote load error:", err);
+
+        // fallback so UI still renders
+        return Object.fromEntries(
+            suspects.map(s => [s, 0])
+        );
+    }
 }
 
 async function sendVote(choice) {
