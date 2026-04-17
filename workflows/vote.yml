@@ -1,28 +1,54 @@
-- name: Update votes
-  run: |
-    node -e "
-    const fs = require('fs');
+name: Process Vote
 
-    const file = 'data/votes.json';
-    const data = JSON.parse(fs.readFileSync(file));
+on:
+  repository_dispatch:
+    types: [cast_vote]
 
-    const payload = process.env.PAYLOAD;
-    const { userId, choice } = JSON.parse(payload);
+permissions:
+  contents: write
 
-    // remove previous vote
-    const previous = data.votesByUser?.[userId];
+jobs:
+  update-votes:
+    runs-on: ubuntu-latest
 
-    if (previous) {
-        data.votes[previous] = Math.max(0, (data.votes[previous] || 0) - 1);
-    }
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    // assign new vote
-    if (!data.votesByUser) data.votesByUser = {};
+      - name: Update votes
+        run: |
+          node -e "
+          const fs = require('fs');
 
-    data.votesByUser[userId] = choice;
-    data.votes[choice] = (data.votes[choice] || 0) + 1;
+          const file = 'data/votes.json';
+          const data = JSON.parse(fs.readFileSync(file));
 
-    fs.writeFileSync(file, JSON.stringify(data, null, 2));
-    "
-  env:
-    PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          const payload = JSON.parse(process.env.PAYLOAD);
+          const { userId, choice } = payload;
+
+          if (!data.votesByUser) data.votesByUser = {};
+          if (!data.votes) data.votes = {};
+
+          const previous = data.votesByUser[userId];
+
+          // remove previous vote
+          if (previous && data.votes[previous] !== undefined) {
+              data.votes[previous] = Math.max(0, data.votes[previous] - 1);
+          }
+
+          // set new vote
+          data.votesByUser[userId] = choice;
+          data.votes[choice] = (data.votes[choice] || 0) + 1;
+
+          fs.writeFileSync(file, JSON.stringify(data, null, 2));
+          "
+        env:
+          PAYLOAD: ${{ toJson(github.event.client_payload) }}
+
+      - name: Commit changes
+        run: |
+          git config user.name "vote-bot"
+          git config user.email "actions@github.com"
+          git add data/votes.json
+          git commit -m "Update vote"
+          git push
