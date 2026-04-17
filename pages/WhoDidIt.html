@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <title>Case File: Who Did It?</title>
 
-<link rel="stylesheet" href="../styles.css">
-
 <style>
 body {
     background: #0d0f12;
@@ -70,16 +68,43 @@ const suspects = [
     "Unknown Entity"
 ];
 
-// Load votes (global count simulation)
-let votes = JSON.parse(localStorage.getItem("votes")) || {};
+const votesURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/data/votes.json";
+
 let userVote = localStorage.getItem("userVote");
 
-// Initialize counts
-suspects.forEach(name => {
-    if (!votes[name]) votes[name] = 0;
-});
+async function loadVotes() {
+    const res = await fetch(votesURL + "?t=" + Date.now()); // cache bust
+    return await res.json();
+}
 
-function render() {
+function saveLocal(votes) {
+    localStorage.setItem("localVotes", JSON.stringify(votes));
+}
+
+function getLocalVotes() {
+    return JSON.parse(localStorage.getItem("localVotes"));
+}
+
+async function vote(name) {
+    let votes = await loadVotes();
+
+    // remove previous vote
+    if (userVote) {
+        votes[userVote] = Math.max(0, votes[userVote] - 1);
+    }
+
+    votes[name] = (votes[name] || 0) + 1;
+
+    userVote = name;
+    localStorage.setItem("userVote", userVote);
+
+    // NOTE: no server write yet
+    saveLocal(votes);
+
+    render(votes);
+}
+
+function render(votes) {
     const container = document.getElementById("suspects");
     container.innerHTML = "";
 
@@ -87,37 +112,21 @@ function render() {
         const div = document.createElement("div");
         div.className = "suspect";
 
-        if (userVote === name) {
-            div.classList.add("selected");
-        }
+        if (userVote === name) div.classList.add("selected");
 
         div.innerHTML = `
             <strong>${name}</strong>
-            <div class="vote-count">Votes: ${votes[name]}</div>
+            <div class="vote-count">Votes: ${votes[name] ?? 0}</div>
         `;
 
         div.onclick = () => vote(name);
+
         container.appendChild(div);
     });
 }
 
-function vote(name) {
-    // Remove previous vote
-    if (userVote) {
-        votes[userVote]--;
-    }
-
-    // Add new vote
-    votes[name]++;
-    userVote = name;
-
-    localStorage.setItem("votes", JSON.stringify(votes));
-    localStorage.setItem("userVote", userVote);
-
-    render();
-}
-
-render();
+// init
+loadVotes().then(render);
 </script>
 
 </body>
