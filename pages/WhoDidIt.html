@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Case File: Who Did It?</title>
+
+<link rel="stylesheet" href="../styles.css">
+
+<style>
+body {
+    background: #0d0f12;
+    color: #d9e1e8;
+    font-family: "Courier New", monospace;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #11161c;
+    padding: 20px;
+    border: 2px solid #2b3a48;
+}
+
+h1 {
+    color: #c40000;
+    text-transform: uppercase;
+}
+
+.suspect {
+    border: 1px solid #2b3a48;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.suspect:hover {
+    background: #18222c;
+}
+
+.selected {
+    border: 2px solid #c40000;
+    background: #1a0f10;
+}
+
+.vote-count {
+    font-size: 12px;
+    color: #888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Case File: Active Investigation</h1>
+    <p>Select the individual you believe is responsible.</p>
+
+    <div id="suspects"></div>
+</div>
+
+<script>
+const suspects = [
+    "Gutau",
+    "Patrick O'mallaghathy",
+    "Usain Holt",
+    "Unknown Entity"
+];
+
+// Load votes (global count simulation)
+let votes = JSON.parse(localStorage.getItem("votes")) || {};
+let userVote = localStorage.getItem("userVote");
+
+// Initialize counts
+suspects.forEach(name => {
+    if (!votes[name]) votes[name] = 0;
+});
+
+function render() {
+    const container = document.getElementById("suspects");
+    container.innerHTML = "";
+
+    suspects.forEach(name => {
+        const div = document.createElement("div");
+        div.className = "suspect";
+
+        if (userVote === name) {
+            div.classList.add("selected");
+        }
+
+        div.innerHTML = `
+            <strong>${name}</strong>
+            <div class="vote-count">Votes: ${votes[name]}</div>
+        `;
+
+        div.onclick = () => vote(name);
+        container.appendChild(div);
+    });
+}
+
+function vote(name) {
+    // Remove previous vote
+    if (userVote) {
+        votes[userVote]--;
+    }
+
+    // Add new vote
+    votes[name]++;
+    userVote = name;
+
+    localStorage.setItem("votes", JSON.stringify(votes));
+    localStorage.setItem("userVote", userVote);
+
+    render();
+}
+
+render();
+</script>
+
+</body>
+</html>
