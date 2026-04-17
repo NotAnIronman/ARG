@@ -135,7 +135,12 @@ function render(votesData) {
         container.appendChild(div);
     });
 }
-
+    
+setInterval(async () => {
+    const updatedVotes = await loadVotes();
+    render(updatedVotes);
+}, 5000); // every 5 seconds
+    
 loadVotes().then(render);
 </script>
 </body>
