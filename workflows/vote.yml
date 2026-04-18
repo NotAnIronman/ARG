@@ -15,40 +15,48 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Update votes
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Debug payload
+        run: echo "${{ toJson(github.event.client_payload) }}"
+
+      - name: Update votes file
         run: |
           node -e "
           const fs = require('fs');
 
           const file = 'data/votes.json';
-          const data = JSON.parse(fs.readFileSync(file));
+          const raw = fs.readFileSync(file, 'utf8');
+          const data = JSON.parse(raw);
 
-          const payload = JSON.parse(process.env.PAYLOAD);
-          const { userId, choice } = payload;
+          const payload = ${{ toJson(github.event.client_payload) }};
+          const userId = payload.userId;
+          const choice = payload.choice;
 
-          if (!data.votesByUser) data.votesByUser = {};
           if (!data.votes) data.votes = {};
+          if (!data.votesByUser) data.votesByUser = {};
 
           const previous = data.votesByUser[userId];
 
-          // remove previous vote
-          if (previous && data.votes[previous] !== undefined) {
-              data.votes[previous] = Math.max(0, data.votes[previous] - 1);
+          if (previous) {
+              data.votes[previous] = Math.max(0, (data.votes[previous] || 0) - 1);
           }
 
-          // set new vote
           data.votesByUser[userId] = choice;
           data.votes[choice] = (data.votes[choice] || 0) + 1;
 
           fs.writeFileSync(file, JSON.stringify(data, null, 2));
+          console.log('Updated votes:', data);
           "
-        env:
-          PAYLOAD: ${{ toJson(github.event.client_payload) }}
 
       - name: Commit changes
         run: |
           git config user.name "vote-bot"
           git config user.email "actions@github.com"
           git add data/votes.json
+          git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "Update vote"
           git push
