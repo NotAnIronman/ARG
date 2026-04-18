@@ -1,12 +1,11 @@
 name: Process Vote
 
 on:
-  issues:
-    types: [opened]
+  repository_dispatch:
+    types: [cast_vote]
 
 permissions:
   contents: write
-  issues: read
 
 jobs:
   update-votes:
@@ -16,40 +15,47 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Update votes
+      - name: Show incoming payload (debug)
+        run: echo '${{ toJson(github.event.client_payload) }}'
+
+      - name: Update votes.json
         run: |
           node -e "
           const fs = require('fs');
 
           const file = 'data/votes.json';
-          const data = JSON.parse(fs.readFileSync(file));
+          const data = JSON.parse(fs.readFileSync(file, 'utf8'));
 
-          const issue = JSON.parse(process.env.ISSUE_BODY);
-
-          const userId = issue.userId;
-          const choice = issue.choice;
+          const payload = ${{ toJson(github.event.client_payload) }};
+          const userId = payload.userId;
+          const choice = payload.choice;
 
           if (!data.votes) data.votes = {};
           if (!data.votesByUser) data.votesByUser = {};
 
           const previous = data.votesByUser[userId];
 
+          // remove previous vote if exists
           if (previous) {
               data.votes[previous] = Math.max(0, (data.votes[previous] || 0) - 1);
           }
 
+          // apply new vote
           data.votesByUser[userId] = choice;
           data.votes[choice] = (data.votes[choice] || 0) + 1;
 
           fs.writeFileSync(file, JSON.stringify(data, null, 2));
+          console.log('Updated vote file:', data);
           "
-        env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
 
       - name: Commit changes
         run: |
           git config user.name "vote-bot"
           git config user.email "actions@github.com"
           git add data/votes.json
-          git commit -m "Update vote from issue"
+
+          # avoid empty commits breaking workflow
+          git diff --cached --quiet && echo "No changes" && exit 0
+
+          git commit -m "Update vote via repository_dispatch"
           git push
