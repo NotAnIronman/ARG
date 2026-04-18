@@ -1,0 +1,16 @@
+title: Deli Aisle News
+description: Breaking News, Top Stories & Analysis
+baseurl: "/ARG"
+url: "https://notanironman.github.io"
+
+# Tell Jekyll where pages live
+collections:
+  pages:
+    output: true
+    permalink: /pages/:name
+
+# Don't process these folders as Jekyll content
+exclude:
+  - images/
+  - data/
+  - .github/
