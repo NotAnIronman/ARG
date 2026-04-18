@@ -200,26 +200,22 @@ function setStatus(msg, cls) {
   el.className = "status " + (cls || "");
 }
 
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyC0TNF7BmaamcPHQKQsKcFnFPQoTwpWDgLOO06jVqY8zAeXbUPtY_vVYLzVvq--IT6/exec";
+
 async function loadVotes() {
   try {
-    const result = await window.storage.get(STORAGE_KEY, true);
-    if (result && result.value) {
-      return JSON.parse(result.value);
-    }
-  } catch(e) {}
-  // initialise
-  const init = { votes: {}, voters: {} };
-  SUSPECTS.forEach(s => init.votes[s] = 0);
-  return init;
+    const res = await fetch(APPS_SCRIPT_URL);
+    return await res.json();
+  } catch(e) {
+    return { votes: {} };
+  }
 }
 
-async function saveVotes(data) {
-  try {
-    await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
-    return true;
-  } catch(e) {
-    return false;
-  }
+async function sendVote(suspect) {
+  await fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify({ userId, suspect }),
+  });
 }
 
 async function castVote(suspect) {
