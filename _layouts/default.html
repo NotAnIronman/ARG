@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ page.title }} | Deli Aisle News</title>
+<link rel="stylesheet" href="{{ '/pages/styles.css' | relative_url }}">
+</head>
+<body>
+
+{% include utility-bar.html %}
+{% include header.html %}
+{% include secondary-nav.html %}
+
+{% if page.breaking_headline %}
+<div class="breaking-bar">
+    <div class="breaking-label">Breaking News :</div>
+    <div class="breaking-headline">{{ page.breaking_headline }}</div>
+</div>
+{% endif %}
+
+{% if page.show_banner %}
+<a href="{{ '/pages/WhoDidIt.html' | relative_url }}" class="sitewide-banner">
+    ⚠ ACTIVE INVESTIGATION — Click to view the case file and cast your vote
+</a>
+{% endif %}
+
+{{ content }}
+
+{% include footer.html %}
+
+</body>
+</html>
