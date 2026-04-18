@@ -18,7 +18,7 @@ body {
                  "Helvetica Neue", Arial, sans-serif;
     background: var(--bg);
     color: var(--text-main);
-    animation: bodyFlicker 7s infinite;
+    animation: bodyFlicker 30s infinite;
 }
 
 a {
