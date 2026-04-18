@@ -100,23 +100,23 @@ async function loadVotes() {
 }
 
 async function sendVote(choice) {
-    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/dispatches`, {
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
         method: "POST",
         headers: {
             "Accept": "application/vnd.github+json",
-            "Content-Type": "application/json",
-            "User-Agent": "arg-vote-client"
+            "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            event_type: "cast_vote",
-            client_payload: {
+            title: `Vote: ${choice}`,
+            body: JSON.stringify({
                 userId,
                 choice
-            }
+            }),
+            labels: ["vote"]
         })
     });
 
-    console.log("Dispatch status:", res.status);
+    console.log("Issue status:", res.status);
 }
 
 async function vote(name) {
