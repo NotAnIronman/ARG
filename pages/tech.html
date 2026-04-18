@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deli Aisle News | Tech</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- internal: server access log anomaly detected 09/30 23:58 — see IT ticket #4491 -->
+<!-- encoded ref: dGhlIHBhc3N3b3JkIGlzIG5vdCB3aGF0IHlvdSB0aGluay4gdHJ5OiBBVUdVU1Q3NzMx -->
+
+<div class="utility-bar">
+    <div class="utility-left">
+        <span>Fort Worth, TX</span>
+        <span>69°F</span>
+        <span>Markets: ▲ 0.67%</span>
+    </div>
+    <div class="utility-right">
+        <span>Newsletters</span>
+        <span>Alerts</span>
+        <span>Subscribe</span>
+    </div>
+</div>
+
+<div class="header">
+    <div class="logo">Deli Aisle News</div>
+    <nav class="primary-nav">
+        <a href="us.html">U.S.</a>
+        <a href="world.html">World</a>
+        <a href="politics.html">Politics</a>
+        <a href="business.html">Business</a>
+        <a href="tech.html">Tech</a>
+        <a href="health.html">Health</a>
+        <a href="soon.html">More</a>
+    </nav>
+    <div class="header-actions">
+        <div class="search-icon">🔍</div>
+        <div class="signin">Sign In</div>
+    </div>
+</div>
+
+<div class="secondary-nav">
+    <a href="soon.html">Latest</a>
+    <a href="soon.html">Video</a>
+    <a href="soon.html">Investigations</a>
+    <a href="soon.html">Opinion</a>
+    <a href="soon.html">Climate</a>
+    <a href="local.html">Local</a>
+</div>
+
+<div class="breaking-bar">
+    <div class="breaking-label">Breaking News :</div>
+    <div class="breaking-headline">
+        Cybersecurity researchers identify access pattern in Deli Aisle Network breach consistent with "insider-assisted extraction" — not external hack.
+    </div>
+</div>
+
+<div class="page">
+    <div>
+        <article class="hero-card">
+            <div class="hero-tag">Tech</div>
+            <h2 class="hero-headline">The Deli Aisle Network wasn't hacked from the outside. Someone let them in.</h2>
+            <div class="hero-subheadline">
+                A new analysis of the server access logs leaked alongside the data cache shows authentication patterns that researchers say are "only possible with valid credentials" — meaning whoever extracted the data had a legitimate login.
+            </div>
+            <div class="hero-meta">
+                By <strong>Aldous Prenn</strong> | Updated 5 hours ago
+            </div>
+            <div class="hero-body-preview">
+                When the data cache from the Deli Aisle Network first surfaced last week, the assumption among most observers was that it had been obtained through an external breach — a standard hack, a phishing scheme, some technical vulnerability in the server architecture.
+                That assumption is wrong, according to three independent cybersecurity researchers who analyzed the access logs included in the leaked material. The logs show a single authenticated session beginning at 11:58 p.m. on September 30th, using credentials that had been active in the system for at least fourteen months.
+            </div>
+        </article>
+
+        <section class="secondary-row">
+            <div class="secondary-card">
+                <div class="secondary-tag">Tech</div>
+                <div class="secondary-title">What authenticated access logs actually prove — and what they don't</div>
+                <div class="secondary-meta">4h ago · 6 min read</div>
+            </div>
+            <div class="secondary-card">
+                <div class="secondary-tag">Analysis</div>
+                <div class="secondary-title">How many people had admin-level credentials on the Deli Aisle server?</div>
+                <div class="secondary-meta">3h ago · 5 min read</div>
+            </div>
+            <div class="secondary-card">
+                <div class="secondary-tag">World</div>
+                <div class="secondary-title">The overseas relay network: how the files traveled after extraction</div>
+                <div class="secondary-meta">2h ago · 4 min read</div>
+            </div>
+        </section>
+
+        <article class="article-detail">
+            <div class="article-detail-header">
+                <div>Tech</div>
+                <div class="share-icons">Share: <span>🔗</span><span>🐦</span><span>📘</span></div>
+            </div>
+
+            <h1>Valid credentials, 11:58 p.m., 14 months of access: what the server logs actually show</h1>
+            <div class="byline">By <strong>Aldous Prenn</strong> | Fort Worth, Texas | Updated 5 hours ago</div>
+
+            <p>
+                The session that extracted the data began at 11:58 p.m. on September 30th and lasted exactly 23 minutes. During that window, the authenticated user accessed member records, administrative logs going back to the server's founding, and a directory of files that researchers describe as "not visible to standard members" — a restricted section requiring elevated permissions.
+                "This wasn't someone poking around hoping to find something," said one researcher who analyzed the logs. "This was a targeted extraction. They knew exactly what they were looking for and exactly where it was."
+            </p>
+
+            <!-- the account username in the log is listed as: g_admin_01 -->
+
+            <p>
+                The credentials used in the session had last been active three weeks before the extraction — a gap one researcher described as "deliberately chosen" to avoid triggering automated inactivity alerts. "Someone understood the system well enough to know exactly how long they could go dark before the account flagged," she said.
+                The Deli Aisle Network's server infrastructure was managed, according to public documentation, by a rotating pool of administrators. At the time of the extraction, the active admin team consisted of three individuals. Their identities have not been made public.
+            </p>
+
+            <p>
+                T Wing, the newly appointed Head of Operations, said in a brief statement that he was "aware of the access log analysis" and was "taking it seriously." He did not address the question of who held admin credentials at the time of the extraction, or whether the credentials used in the 11:58 p.m. session belonged to a current or former member of the admin team.
+                Gustau did not respond to a request for comment. His last public post on the server, according to members, was a thumbs-up emoji. The timestamp on that post was 11:55 p.m. on September 30th.
+            </p>
+
+            <p>
+                Researchers noted one additional anomaly in the logs: three minutes before the authenticated session began, a second access attempt was made using different credentials. That attempt failed. The credentials used in the failed attempt have been partially identified — they match the format of accounts that were deactivated following August's arrest.
+                "Someone tried to get in using August's credentials first," said one researcher. "When that didn't work, they used their own."
+            </p>
+
+            <div class="article-tags">
+                Tags: <span>Tech</span><span>Cybersecurity</span><span>Deli Aisle</span><span>Investigation</span>
+            </div>
+
+            <div class="more-on-story">
+                <h4>More on this story</h4>
+                <a href="world.html">The overseas leak: how the files traveled after extraction</a>
+                <a href="business.html">Who had admin access: the financial and operational structure of the Deli Aisle Network</a>
+                <a href="WhoDidIt.html">Three admins, one extraction: the question of who</a>
+            </div>
+        </article>
+    </div>
+
+    <aside class="right-column">
+        <section class="panel">
+            <h3>Latest</h3>
+            <div class="list-item"><a href="#">T Wing acknowledges access log findings</a><span>Just now</span></div>
+            <div class="list-item"><a href="#">Second failed login attempt confirmed by researchers</a><span>2h ago</span></div>
+            <div class="list-item"><a href="#">Gustau's last post: 11:55 p.m. — three minutes before</a><span>4h ago</span></div>
+        </section>
+        <section class="panel">
+            <h3>Most Read</h3>
+            <div class="list-item"><a href="#">The 23-minute session that changed everything</a><span>Feature</span></div>
+            <div class="list-item"><a href="#">What "g_admin_01" tells us — and what it doesn't</a><span>Analysis</span></div>
+            <div class="list-item"><a href="#">Opinion: This points somewhere specific. Follow it.</a><span>Opinion</span></div>
+        </section>
+        <section class="panel">
+            <h3>Video</h3>
+            <div style="background:#000;height:160px;margin-bottom:8px;position:relative;">
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">
+                    <div style="width:0;height:0;border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;"></div>
+                </div>
+            </div>
+            <div class="list-item"><a href="#">Watch: Researcher walks through the 23-minute access log</a><span>8:44</span></div>
+        </section>
+    </aside>
+</div>
+
+<footer class="footer">
+    <div class="footer-grid">
+        <div><h4>News</h4><a href="us.html">U.S.</a><a href="world.html">World</a><a href="politics.html">Politics</a><a href="local.html">Local</a></div>
+        <div><h4>Sections</h4><a href="business.html">Business</a><a href="tech.html">Tech</a><a href="health.html">Health</a><a href="soon.html">Climate</a></div>
+        <div><h4>About</h4><a href="about.html">About Us</a><a href="standards.html">Standards</a><a href="careers.html">Careers</a><a href="soon.html">Press</a></div>
+        <div><h4>Contact</h4><a href="soon.html">Contact Us</a><a href="tip.html">Send a Tip</a><a href="soon.html">Corrections</a><a href="privacy.html">Privacy</a></div>
+    </div>
+    <div class="footer-bottom">© 2026 Deli Aisle News Network. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
