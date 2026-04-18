@@ -1,169 +1,332 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Case File: Who Did It?</title>
-
 <style>
-body {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
     background: #0d0f12;
     color: #d9e1e8;
     font-family: "Courier New", monospace;
-}
-
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    background: #11161c;
-    padding: 20px;
-    border: 2px solid #2b3a48;
-}
-
-h1 {
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+  .header {
+    border-bottom: 2px solid #c40000;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  h1 {
     color: #c40000;
+    font-size: 22px;
+    letter-spacing: 4px;
     text-transform: uppercase;
-}
-
-.suspect {
+  }
+  .stamp {
+    display: inline-block;
+    border: 2px solid #c40000;
+    color: #c40000;
+    font-size: 10px;
+    letter-spacing: 3px;
+    padding: 2px 8px;
+    margin-top: 6px;
+    opacity: 0.8;
+  }
+  .subtitle {
+    color: #7a8fa3;
+    font-size: 12px;
+    margin-top: 10px;
+    letter-spacing: 1px;
+  }
+  .suspects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .suspect {
     border: 1px solid #2b3a48;
-    padding: 12px;
-    margin-bottom: 10px;
+    padding: 14px 16px;
     cursor: pointer;
-}
-
-.suspect:hover {
-    background: #18222c;
-}
-
-.selected {
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+    background: #11161c;
+    user-select: none;
+  }
+  .suspect:hover { background: #16202a; border-color: #4a6070; }
+  .suspect.selected {
     border: 2px solid #c40000;
     background: #1a0f10;
-}
-
-.vote-count {
+  }
+  .suspect.selected::before {
+    content: "▶ SUSPECT";
+    position: absolute;
+    top: 6px; right: 10px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #c40000;
+  }
+  .suspect-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #d9e1e8;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .bar-wrap {
+    background: #1a2530;
+    height: 6px;
+    width: 100%;
+    margin-bottom: 4px;
+  }
+  .bar-fill {
+    height: 6px;
+    background: #2b5a80;
+    transition: width 0.6s ease;
+  }
+  .suspect.selected .bar-fill { background: #c40000; }
+  .vote-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #556677;
+    letter-spacing: 1px;
+  }
+  .vote-count { color: #7a8fa3; }
+  .pct { color: #556677; }
+  .footer {
+    border-top: 1px solid #2b3a48;
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    gap: 10px;
+  }
+  .total-votes {
+    font-size: 11px;
+    color: #556677;
+    letter-spacing: 1px;
+  }
+  .total-votes span { color: #7a8fa3; }
+  .status {
+    font-size: 11px;
+    color: #556677;
+    letter-spacing: 1px;
+  }
+  .status.ok { color: #2e7a4e; }
+  .status.err { color: #c40000; }
+  .change-vote {
+    font-size: 11px;
+    color: #7a8fa3;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: underline;
+    border: none;
+    background: none;
+    color: #7a8fa3;
+    font-family: "Courier New", monospace;
+  }
+  .change-vote:hover { color: #c40000; }
+  .loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: #556677;
+    letter-spacing: 2px;
     font-size: 12px;
-    color: #888;
-}
+  }
+  .loading span { animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .redact {
+    display: inline-block;
+    background: #c40000;
+    color: #c40000;
+    font-size: 10px;
+    padding: 0 4px;
+    user-select: none;
+  }
 </style>
 </head>
-
 <body>
-
 <div class="container">
+  <div class="header">
+    <div class="stamp">CLASSIFIED</div>
     <h1>Case File: Active Investigation</h1>
-    <p>Select the individual you believe is responsible.</p>
-
-    <div id="suspects"></div>
+    <p class="subtitle">IDENTIFY THE PERPETRATOR — SELECT THE INDIVIDUAL YOU BELIEVE IS RESPONSIBLE</p>
+  </div>
+  <div id="app"><div class="loading">ACCESSING CASE DATABASE<span>...</span></div></div>
+  <div class="footer">
+    <div class="total-votes" id="total-wrap" style="display:none">TOTAL VOTES: <span id="total-count">0</span></div>
+    <div class="status" id="status"></div>
+    <button class="change-vote" id="change-btn" style="display:none" onclick="changeVote()">[ REVISE TESTIMONY ]</button>
+  </div>
 </div>
 
 <script>
-const owner = "NotAnIronman";
-const repo = "ARG";
-
-const suspects = [
-    "Gustau",
-    "Nathan Bartholemew",
-    "Ricardo Saintiagoon",
-    "Patrick O'mallaghathy",
-    "Usain Holt",
-    "T Wing",
-    "Freedough",
-    "Unknown Entity"
+const SUSPECTS = [
+  "Gustau",
+  "Nathan Bartholemew",
+  "Ricardo Saintiagoon",
+  "Patrick O'mallaghathy",
+  "Usain Holt",
+  "T Wing",
+  "Freedough",
+  "Unknown Entity"
 ];
 
-// persistent device ID
-let userId = localStorage.getItem("userId");
+const STORAGE_KEY = "arg-votes-v1";
+const USER_KEY = "arg-user-id";
+const USER_VOTE_KEY = "arg-user-vote";
+
+let userId = localStorage.getItem(USER_KEY);
 if (!userId) {
-    userId = crypto.randomUUID();
-    localStorage.setItem("userId", userId);
+  userId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  localStorage.setItem(USER_KEY, userId);
 }
 
-let userVote = localStorage.getItem("userVote");
+let userVote = localStorage.getItem(USER_VOTE_KEY);
+let voteData = null;
+let locked = false;
+
+function setStatus(msg, cls) {
+  const el = document.getElementById("status");
+  el.textContent = msg;
+  el.className = "status " + (cls || "");
+}
 
 async function loadVotes() {
-    try {
-        const res = await fetch(
-            `https://raw.githubusercontent.com/${owner}/${repo}/main/data/votes.json?t=${Date.now()}`
-        );
-
-        if (!res.ok) throw new Error("Failed to load votes");
-
-        return await res.json();
-    } catch (e) {
-        console.error(e);
-
-        return {
-            votes: Object.fromEntries(suspects.map(s => [s, 0])),
-            votesByUser: {}
-        };
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true);
+    if (result && result.value) {
+      return JSON.parse(result.value);
     }
+  } catch(e) {}
+  // initialise
+  const init = { votes: {}, voters: {} };
+  SUSPECTS.forEach(s => init.votes[s] = 0);
+  return init;
 }
 
-async function sendVote(choice) {
-    await fetch("https://api.github.com/repos/NotAnIronman/ARG/dispatches", {
-        method: "POST",
-        headers: {
-            "Accept": "application/vnd.github+json",
-            "Content-Type": "application/json",
-            "Authorization": "Bearer YOUR_TOKEN_HERE"
-        },
-        body: JSON.stringify({
-            event_type: "cast_vote",
-            client_payload: {
-                userId,
-                choice
-            }
-        })
-    });
+async function saveVotes(data) {
+  try {
+    await window.storage.set(STORAGE_KEY, JSON.stringify(data), true);
+    return true;
+  } catch(e) {
+    return false;
+  }
 }
 
-async function vote(name) {
-    userVote = name;
-    localStorage.setItem("userVote", name);
+async function castVote(suspect) {
+  if (locked) return;
+  locked = true;
+  setStatus("PROCESSING...");
 
-    await sendVote(name);
+  // Re-fetch latest before writing to avoid races
+  let data = await loadVotes();
 
-    alert("Vote submitted to case database.");
+  // Remove old vote if exists
+  if (data.voters[userId]) {
+    const old = data.voters[userId];
+    if (data.votes[old] > 0) data.votes[old]--;
+  }
+
+  // Add new vote
+  data.voters[userId] = suspect;
+  data.votes[suspect] = (data.votes[suspect] || 0) + 1;
+
+  const ok = await saveVotes(data);
+  if (ok) {
+    userVote = suspect;
+    localStorage.setItem(USER_VOTE_KEY, suspect);
+    voteData = data;
+    setStatus("TESTIMONY RECORDED", "ok");
+    render(data);
+    document.getElementById("change-btn").style.display = "";
+  } else {
+    setStatus("TRANSMISSION FAILED", "err");
+  }
+  locked = false;
+}
+
+function changeVote() {
+  userVote = null;
+  localStorage.removeItem(USER_VOTE_KEY);
+  setStatus("TESTIMONY CLEARED");
+  document.getElementById("change-btn").style.display = "none";
+  render(voteData);
 }
 
 function render(data) {
-    const votes = data?.votes || {};
+  const votes = data.votes || {};
+  const total = Object.values(votes).reduce((a, b) => a + b, 0);
 
-    const container = document.getElementById("suspects");
-    container.innerHTML = "";
+  // sort by votes descending
+  const sorted = [...SUSPECTS].sort((a, b) => (votes[b] || 0) - (votes[a] || 0));
 
-    suspects.forEach(name => {
-        const div = document.createElement("div");
-        div.className = "suspect";
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.className = "suspects-grid";
 
-        if (userVote === name) div.classList.add("selected");
+  sorted.forEach(name => {
+    const count = votes[name] || 0;
+    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+    const isSelected = userVote === name;
 
-        div.innerHTML = `
-            <strong>${name}</strong>
-            <div class="vote-count">Votes: ${votes[name] || 0}</div>
-        `;
+    const div = document.createElement("div");
+    div.className = "suspect" + (isSelected ? " selected" : "");
+    div.innerHTML = `
+      <div class="suspect-name">${name}</div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="vote-meta">
+        <span class="vote-count">${count} VOTE${count !== 1 ? "S" : ""}</span>
+        <span class="pct">${pct}%</span>
+      </div>
+    `;
+    if (!userVote) {
+      div.onclick = () => castVote(name);
+    }
+    grid.appendChild(div);
+  });
 
-        div.onclick = () => vote(name);
+  app.appendChild(grid);
 
-        container.appendChild(div);
-    });
+  const totalWrap = document.getElementById("total-wrap");
+  totalWrap.style.display = "";
+  document.getElementById("total-count").textContent = total;
+
+  if (userVote) {
+    document.getElementById("change-btn").style.display = "";
+  }
 }
 
-// live polling (optional but good for ARG feel)
-let lastState = "";
+// Poll for live updates every 5s
+async function poll() {
+  const data = await loadVotes();
+  const newStr = JSON.stringify(data.votes);
+  const oldStr = voteData ? JSON.stringify(voteData.votes) : "";
+  if (newStr !== oldStr) {
+    voteData = data;
+    render(data);
+  }
+}
 
-setInterval(async () => {
-    const data = await loadVotes();
-    const str = JSON.stringify(data);
-
-    if (str !== lastState) {
-        lastState = str;
-        render(data);
-    }
-}, 4000);
-
-// initial load
-loadVotes().then(render);
+// Init
+(async () => {
+  voteData = await loadVotes();
+  render(voteData);
+  if (userVote) {
+    setStatus("TESTIMONY ON FILE", "ok");
+    document.getElementById("change-btn").style.display = "";
+  }
+  setInterval(poll, 5000);
+})();
 </script>
 </body>
 </html>
