@@ -440,7 +440,7 @@ body::before {
     width: 100%; height: 100%;
     pointer-events: none;
     z-index: 9999;
-    animation: rgbSlice 9s infinite;
+    animation: rgbSlice 20s infinite;
 }
 
 @keyframes rgbSlice {
