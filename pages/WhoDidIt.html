@@ -5,152 +5,137 @@
 <meta charset="UTF-8">
 <title>Case File: Who Did It?</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #0d0f12;
-    color: #d9e1e8;
-    font-family: "Courier New", monospace;
-    min-height: 100vh;
-  }
-  .container {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 32px 20px;
-  }
-  .header {
-    border-bottom: 2px solid #c40000;
-    padding-bottom: 16px;
-    margin-bottom: 24px;
-  }
-  h1 {
-    color: #c40000;
-    font-size: 22px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-  }
-  .stamp {
-    display: inline-block;
-    border: 2px solid #c40000;
-    color: #c40000;
-    font-size: 10px;
-    letter-spacing: 3px;
-    padding: 2px 8px;
-    margin-top: 6px;
-    opacity: 0.8;
-  }
-  .subtitle {
-    color: #7a8fa3;
-    font-size: 12px;
-    margin-top: 10px;
-    letter-spacing: 1px;
-  }
-  .suspects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-  .suspect {
-    border: 1px solid #2b3a48;
-    padding: 14px 16px;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    position: relative;
-    background: #11161c;
-    user-select: none;
-  }
-  .suspect:hover { background: #16202a; border-color: #4a6070; }
-  .suspect.selected {
-    border: 2px solid #c40000;
-    background: #1a0f10;
-  }
-  .suspect.selected::before {
-    content: "▶ SUSPECT";
-    position: absolute;
-    top: 6px; right: 10px;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: #c40000;
-  }
-  .suspect-name {
-    font-size: 14px;
-    font-weight: bold;
-    color: #d9e1e8;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
-  .bar-wrap {
-    background: #1a2530;
-    height: 6px;
-    width: 100%;
-    margin-bottom: 4px;
-  }
-  .bar-fill {
-    height: 6px;
-    background: #2b5a80;
-    transition: width 0.6s ease;
-  }
-  .suspect.selected .bar-fill { background: #c40000; }
-  .vote-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: #556677;
-    letter-spacing: 1px;
-  }
-  .vote-count { color: #7a8fa3; }
-  .pct { color: #556677; }
-  .footer {
-    border-top: 1px solid #2b3a48;
-    padding-top: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: gap;
-    gap: 10px;
-  }
-  .total-votes {
-    font-size: 11px;
-    color: #556677;
-    letter-spacing: 1px;
-  }
-  .total-votes span { color: #7a8fa3; }
-  .status {
-    font-size: 11px;
-    color: #556677;
-    letter-spacing: 1px;
-  }
-  .status.ok { color: #2e7a4e; }
-  .status.err { color: #c40000; }
-  .change-vote {
-    font-size: 11px;
-    color: #7a8fa3;
-    letter-spacing: 1px;
-    cursor: pointer;
-    text-decoration: underline;
-    border: none;
-    background: none;
-    color: #7a8fa3;
-    font-family: "Courier New", monospace;
-  }
-  .change-vote:hover { color: #c40000; }
-  .loading {
-    text-align: center;
-    padding: 60px 20px;
-    color: #556677;
-    letter-spacing: 2px;
-    font-size: 12px;
-  }
-  .loading span { animation: blink 1s step-end infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  .redact {
-    display: inline-block;
-    background: #c40000;
-    color: #c40000;
-    font-size: 10px;
-    padding: 0 4px;
-    user-select: none;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0d0f12;
+  color: #d9e1e8;
+  font-family: "Courier New", monospace;
+  min-height: 100vh;
+}
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+.header {
+  border-bottom: 2px solid #c40000;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+.stamp {
+  display: inline-block;
+  border: 2px solid #c40000;
+  color: #c40000;
+  font-size: 10px;
+  letter-spacing: 3px;
+  padding: 2px 8px;
+  margin-bottom: 8px;
+}
+h1 {
+  color: #c40000;
+  font-size: 22px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+.subtitle {
+  color: #7a8fa3;
+  font-size: 12px;
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+.suspects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.suspect {
+  border: 1px solid #2b3a48;
+  padding: 14px 16px;
+  cursor: pointer;
+  background: #11161c;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.suspect:hover:not(.voted) { background: #16202a; border-color: #4a6070; }
+.suspect.selected {
+  border: 2px solid #c40000;
+  background: #1a0f10;
+}
+.suspect.selected::after {
+  content: "YOUR VOTE";
+  position: absolute;
+  top: 8px; right: 10px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #c40000;
+}
+.suspect.voted { cursor: default; }
+.suspect-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #d9e1e8;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.bar-wrap {
+  background: #1a2530;
+  height: 5px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.bar-fill {
+  height: 5px;
+  background: #2b5a80;
+  transition: width 0.7s ease;
+}
+.suspect.selected .bar-fill { background: #c40000; }
+.vote-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #556677;
+  letter-spacing: 1px;
+}
+.footer {
+  border-top: 1px solid #2b3a48;
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.total-votes {
+  font-size: 11px;
+  color: #556677;
+  letter-spacing: 1px;
+}
+.total-votes span { color: #7a8fa3; }
+.status { font-size: 11px; letter-spacing: 1px; color: #556677; }
+.status.ok  { color: #2e7a4e; }
+.status.err { color: #c40000; }
+.change-btn {
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #7a8fa3;
+  font-family: "Courier New", monospace;
+  text-decoration: underline;
+}
+.change-btn:hover { color: #c40000; }
+.loading-msg {
+  text-align: center;
+  padding: 60px 20px;
+  color: #556677;
+  letter-spacing: 2px;
+  font-size: 12px;
+}
+.loading-msg span { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
 </style>
 </head>
 <body>
@@ -160,15 +145,20 @@
     <h1>Case File: Active Investigation</h1>
     <p class="subtitle">IDENTIFY THE PERPETRATOR — SELECT THE INDIVIDUAL YOU BELIEVE IS RESPONSIBLE</p>
   </div>
-  <div id="app"><div class="loading">ACCESSING CASE DATABASE<span>...</span></div></div>
+
+  <div id="app"><div class="loading-msg">ACCESSING CASE DATABASE<span>...</span></div></div>
+
   <div class="footer">
-    <div class="total-votes" id="total-wrap" style="display:none">TOTAL VOTES: <span id="total-count">0</span></div>
+    <div class="total-votes" id="total-wrap" style="visibility:hidden">TOTAL VOTES: <span id="total-count">0</span></div>
     <div class="status" id="status"></div>
-    <button class="change-vote" id="change-btn" style="display:none" onclick="changeVote()">[ REVISE TESTIMONY ]</button>
+    <button class="change-btn" id="change-btn" style="display:none" onclick="changeVote()">[ REVISE TESTIMONY ]</button>
   </div>
 </div>
 
 <script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyC0TNF7BmaamcPHQKQsKcFnFPQoTwpWDgLOO06jVqY8zAeXbUPtY_vVYLzVvq--IT6/exec";
+
 const SUSPECTS = [
   "Gustau",
   "Nathan Bartholemew",
@@ -179,20 +169,17 @@ const SUSPECTS = [
   "Freedough",
   "Unknown Entity"
 ];
+// ─────────────────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = "arg-votes-v1";
-const USER_KEY = "arg-user-id";
-const USER_VOTE_KEY = "arg-user-vote";
-
-let userId = localStorage.getItem(USER_KEY);
+let userId = localStorage.getItem("arg-uid");
 if (!userId) {
   userId = Math.random().toString(36).slice(2) + Date.now().toString(36);
-  localStorage.setItem(USER_KEY, userId);
+  localStorage.setItem("arg-uid", userId);
 }
 
-let userVote = localStorage.getItem(USER_VOTE_KEY);
-let voteData = null;
-let locked = false;
+let userVote    = localStorage.getItem("arg-vote");
+let currentData = null;
+let busy        = false;
 
 function setStatus(msg, cls) {
   const el = document.getElementById("status");
@@ -200,69 +187,74 @@ function setStatus(msg, cls) {
   el.className = "status " + (cls || "");
 }
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbyC0TNF7BmaamcPHQKQsKcFnFPQoTwpWDgLOO06jVqY8zAeXbUPtY_vVYLzVvq--IT6/exec";
-
+// GET votes — plain fetch, Apps Script returns JSON
 async function loadVotes() {
-  try {
-    const res = await fetch(APPS_SCRIPT_URL);
-    return await res.json();
-  } catch(e) {
-    return { votes: {} };
-  }
+  const res = await fetch(APPS_SCRIPT_URL + "?t=" + Date.now());
+  const json = await res.json();
+  return json; // { votes: { "Gustau": 3, ... } }
 }
 
-async function sendVote(suspect) {
+// POST vote — no-cors because Apps Script redirects trigger CORS preflight issues.
+// We fire-and-forget the POST, then poll the GET after a short delay.
+async function postVote(suspect) {
   await fetch(APPS_SCRIPT_URL, {
     method: "POST",
-    body: JSON.stringify({ userId, suspect }),
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain" }, // text/plain skips preflight
+    body: JSON.stringify({ userId, suspect })
   });
 }
 
 async function castVote(suspect) {
-  if (locked) return;
-  locked = true;
-  setStatus("PROCESSING...");
+  if (busy) return;
+  busy = true;
+  setStatus("TRANSMITTING...");
 
-  // Re-fetch latest before writing to avoid races
-  let data = await loadVotes();
-
-  // Remove old vote if exists
-  if (data.voters[userId]) {
-    const old = data.voters[userId];
-    if (data.votes[old] > 0) data.votes[old]--;
+  try {
+    await postVote(suspect);
+  } catch(e) {
+    // no-cors swallows errors; continue to poll
   }
 
-  // Add new vote
-  data.voters[userId] = suspect;
-  data.votes[suspect] = (data.votes[suspect] || 0) + 1;
-
-  const ok = await saveVotes(data);
-  if (ok) {
-    userVote = suspect;
-    localStorage.setItem(USER_VOTE_KEY, suspect);
-    voteData = data;
-    setStatus("TESTIMONY RECORDED", "ok");
-    render(data);
-    document.getElementById("change-btn").style.display = "";
-  } else {
-    setStatus("TRANSMISSION FAILED", "err");
-  }
-  locked = false;
+  // Poll until the new vote appears (up to ~15s)
+  let attempts = 0;
+  const poll = setInterval(async () => {
+    attempts++;
+    try {
+      const data = await loadVotes();
+      const confirmed = (data.votes?.[suspect] || 0) > (currentData?.votes?.[suspect] || 0);
+      if (confirmed || attempts >= 15) {
+        clearInterval(poll);
+        userVote = suspect;
+        localStorage.setItem("arg-vote", suspect);
+        currentData = data;
+        render(data);
+        setStatus("TESTIMONY RECORDED", "ok");
+        document.getElementById("change-btn").style.display = "";
+        busy = false;
+      }
+    } catch(e) {
+      if (attempts >= 15) {
+        clearInterval(poll);
+        setStatus("TRANSMISSION FAILED — RETRY", "err");
+        busy = false;
+      }
+    }
+  }, 1000);
 }
 
 function changeVote() {
   userVote = null;
-  localStorage.removeItem(USER_VOTE_KEY);
+  localStorage.removeItem("arg-vote");
   setStatus("TESTIMONY CLEARED");
   document.getElementById("change-btn").style.display = "none";
-  render(voteData);
+  render(currentData);
 }
 
 function render(data) {
-  const votes = data.votes || {};
+  const votes = data?.votes || {};
   const total = Object.values(votes).reduce((a, b) => a + b, 0);
 
-  // sort by votes descending
   const sorted = [...SUSPECTS].sort((a, b) => (votes[b] || 0) - (votes[a] || 0));
 
   const app = document.getElementById("app");
@@ -272,56 +264,58 @@ function render(data) {
 
   sorted.forEach(name => {
     const count = votes[name] || 0;
-    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-    const isSelected = userVote === name;
+    const pct   = total > 0 ? Math.round((count / total) * 100) : 0;
+    const isMine = userVote === name;
 
     const div = document.createElement("div");
-    div.className = "suspect" + (isSelected ? " selected" : "");
+    div.className = "suspect" + (isMine ? " selected" : "") + (userVote ? " voted" : "");
     div.innerHTML = `
       <div class="suspect-name">${name}</div>
       <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
       <div class="vote-meta">
-        <span class="vote-count">${count} VOTE${count !== 1 ? "S" : ""}</span>
-        <span class="pct">${pct}%</span>
-      </div>
-    `;
-    if (!userVote) {
-      div.onclick = () => castVote(name);
-    }
+        <span>${count} VOTE${count !== 1 ? "S" : ""}</span>
+        <span>${pct}%</span>
+      </div>`;
+
+    if (!userVote) div.onclick = () => castVote(name);
     grid.appendChild(div);
   });
 
   app.appendChild(grid);
-
-  const totalWrap = document.getElementById("total-wrap");
-  totalWrap.style.display = "";
+  const tw = document.getElementById("total-wrap");
+  tw.style.visibility = "";
   document.getElementById("total-count").textContent = total;
-
-  if (userVote) {
-    document.getElementById("change-btn").style.display = "";
-  }
 }
 
-// Poll for live updates every 5s
-async function poll() {
-  const data = await loadVotes();
-  const newStr = JSON.stringify(data.votes);
-  const oldStr = voteData ? JSON.stringify(voteData.votes) : "";
-  if (newStr !== oldStr) {
-    voteData = data;
-    render(data);
-  }
+// Live poll every 8s
+let lastStr = "";
+async function livePoll() {
+  try {
+    const data = await loadVotes();
+    const str = JSON.stringify(data.votes);
+    if (str !== lastStr) {
+      lastStr = str;
+      currentData = data;
+      if (!busy) render(data);
+    }
+  } catch(e) {}
 }
 
 // Init
 (async () => {
-  voteData = await loadVotes();
-  render(voteData);
-  if (userVote) {
-    setStatus("TESTIMONY ON FILE", "ok");
-    document.getElementById("change-btn").style.display = "";
+  try {
+    currentData = await loadVotes();
+    lastStr = JSON.stringify(currentData.votes);
+    render(currentData);
+    if (userVote) {
+      setStatus("TESTIMONY ON FILE", "ok");
+      document.getElementById("change-btn").style.display = "";
+    }
+  } catch(e) {
+    document.getElementById("app").innerHTML =
+      '<div class="loading-msg" style="color:#c40000">CONNECTION FAILED — CHECK SCRIPT URL</div>';
   }
-  setInterval(poll, 5000);
+  setInterval(livePoll, 8000);
 })();
 </script>
 </body>
