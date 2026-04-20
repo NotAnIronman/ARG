@@ -254,9 +254,9 @@ async function castVote(suspect) {
         render(data);
 
         if (suspect === correctAnswer) {
-          setStatus("CORRECT — YOU IDENTIFIED THE PERPETRATOR", "ok");
+          setStatus("Great job! You caught the killer, you're getting a promotion!", "ok");
         } else {
-          setStatus("INCORRECT — YOUR TESTIMONY HAS BEEN LOGGED", "err");
+          setStatus("INCORRECT — Pack your things, you're fired.", "err");
         }
 
         busy = false;
@@ -328,9 +328,9 @@ function render(data) {
 
     if (userVote) {
       if (userVote === correctAnswer) {
-        setStatus("CORRECT — YOU IDENTIFIED THE PERPETRATOR", "ok");
+        setStatus("Great job! You caught the killer, you're getting a promotion!", "ok");
       } else {
-        setStatus("INCORRECT — YOUR TESTIMONY HAS BEEN LOGGED", "err");
+        setStatus("INCORRECT — Pack your things, you're fired.", "err");
       }
     }
   } catch(e) {
