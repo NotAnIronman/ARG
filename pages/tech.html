@@ -1,12 +1,13 @@
 ---
 layout: default
-title: "Breaking News"
-breaking_headline: "Authorities investigating, as disgraced former Deli Aisle Owner found dead in apparent suicide."
+title: "Tech"
+breaking_headline: "New analysis suggests the Deli Aisle Network breach was an inside job — and the effects are still visible."
 show_banner: true
 ---
 
 <div class="page">
     <div>
+
         <article class="hero-card">
             <div class="hero-tag">Tech</div>
             <h2 class="hero-headline">The Deli Aisle Network wasn't hacked from the outside. Someone let them in.</h2>
@@ -17,7 +18,7 @@ show_banner: true
                 By <strong>Aldous Prenn</strong> | Updated 5 hours ago
             </div>
             <div class="hero-body-preview">
-                When the data cache from the Deli Aisle Network first surfaced last week, the assumption among most observers was that it had been obtained through an external breach — a standard hack, a phishing scheme, some technical vulnerability in the server architecture.
+                When the data cache from the Deli Aisle Network first surfaced last week, most observers assumed it had been obtained through an external breach — a standard hack, a phishing scheme, some technical vulnerability in the server architecture.
                 That assumption is wrong, according to three independent cybersecurity researchers who analyzed the access logs included in the leaked material. The logs show a single authenticated session beginning at 11:58 p.m. on September 30th, using credentials that had been active in the system for at least fourteen months.
             </div>
         </article>
@@ -51,24 +52,63 @@ show_banner: true
 
             <p>
                 The session that extracted the data began at 11:58 p.m. on September 30th and lasted exactly 23 minutes. During that window, the authenticated user accessed member records, administrative logs going back to the server's founding, and a directory of files that researchers describe as "not visible to standard members" — a restricted section requiring elevated permissions.
-                "This wasn't someone poking around hoping to find something," said one researcher who analyzed the logs. "This was a targeted extraction. They knew exactly what they were looking for and exactly where it was."
+                "This wasn't someone poking around hoping to find something," said one researcher. "This was a targeted extraction. They knew exactly what they were looking for and exactly where it was."
             </p>
 
             <!-- the account username in the log is listed as: g_admin_01 -->
+            <!-- this username appears in our own CMS error logs as recently as 03:14 CST -->
 
             <p>
                 The credentials used in the session had last been active three weeks before the extraction — a gap one researcher described as "deliberately chosen" to avoid triggering automated inactivity alerts. "Someone understood the system well enough to know exactly how long they could go dark before the account flagged," she said.
+            </p>
+
+            <p>
                 The Deli Aisle Network's server infrastructure was managed, according to public documentation, by a rotating pool of administrators. At the time of the extraction, the active admin team consisted of three individuals. Their identities have not been made public.
             </p>
 
             <p>
                 T Wing, the newly appointed Head of Operations, said in a brief statement that he was "aware of the access log analysis" and was "taking it seriously." He did not address the question of who held admin credentials at the time of the extraction, or whether the credentials used in the 11:58 p.m. session belonged to a current or former member of the admin team.
-                Gustau did not respond to a request for comment. His last public post on the server, according to members, was a thumbs-up emoji. The timestamp on that post was 11:55 p.m. on September 30th.
             </p>
 
             <p>
+                Gustau did not respond to a request for comment. His last public post on the server, according to members, was a thumbs-up emoji. The timestamp on that post was 11:55 p.m. on September 30th.
+            </p>
+
+            <!-- our site logs show a rendering error at 11:55 p.m. on 9/30 -->
+            <!-- error code: RENDER_FAIL_55 — same code appears in the leaked logs -->
+
+            <p>
                 Researchers noted one additional anomaly in the logs: three minutes before the authenticated session began, a second access attempt was made using different credentials. That attempt failed. The credentials used in the failed attempt have been partially identified — they match the format of accounts that were deactivated following August's arrest.
+            </p>
+
+            <p>
                 "Someone tried to get in using August's credentials first," said one researcher. "When that didn't work, they used their own."
+            </p>
+
+            <h2 style="margin-top:40px;">Why the Deli Aisle News site is glitching</h2>
+
+            <p>
+                Since the data cache surfaced, readers have reported intermittent glitches on this site: flickering elements, missing images, pages reverting to older versions, timestamps stuck at 03:14 CST, and occasional redirects to blank pages.
+            </p>
+
+            <p>
+                Our technical team has confirmed that these issues are not caused by user devices. They originate from our own content management system — specifically, from automated processes attempting to overwrite or restore older versions of pages.
+            </p>
+
+            <!-- CMS auto-restore triggered 03:14 CST -->
+            <!-- auto-restore source: unknown -->
+            <!-- affected pages: individuals.html, soon.html, standards.html, tech.html -->
+
+            <p>
+                The timing is notable. The first glitch occurred at 03:14 CST on October 1st — the same minute the anonymous tip was submitted, the same minute the privacy policy auto-forward was enabled, and the same minute our internal logs show an unauthorized attempt to access the editorial backend.
+            </p>
+
+            <p>
+                "This is spillover," said one researcher. "Whatever happened inside the Deli Aisle Network's servers didn't stay contained. Someone used the same credentials — or the same automation — to probe your system too."
+            </p>
+
+            <p>
+                Our technical team is continuing to investigate. We will publish updates as we learn more.
             </p>
 
             <div class="article-tags">
@@ -78,7 +118,7 @@ show_banner: true
             <div class="more-on-story">
                 <h4>More on this story</h4>
                 <a href="world.html">The overseas leak: how the files traveled after extraction</a>
-                <a href="business.html">Who had admin access: the financial and operational structure of the Deli Aisle Network</a>
+                <a href="business.html">Who had admin access: the operational structure of the Deli Aisle Network</a>
                 <a href="WhoDidIt.html">Three admins, one extraction: the question of who</a>
             </div>
         </article>
@@ -91,12 +131,14 @@ show_banner: true
             <div class="list-item"><a href="#">Second failed login attempt confirmed by researchers</a><span>2h ago</span></div>
             <div class="list-item"><a href="#">Gustau's last post: 11:55 p.m. — three minutes before</a><span>4h ago</span></div>
         </section>
+
         <section class="panel">
             <h3>Most Read</h3>
             <div class="list-item"><a href="#">The 23-minute session that changed everything</a><span>Feature</span></div>
             <div class="list-item"><a href="#">What "g_admin_01" tells us — and what it doesn't</a><span>Analysis</span></div>
             <div class="list-item"><a href="#">Opinion: This points somewhere specific. Follow it.</a><span>Opinion</span></div>
         </section>
+
         <section class="panel">
             <h3>Video</h3>
             <div style="background:#000;height:160px;margin-bottom:8px;position:relative;">
