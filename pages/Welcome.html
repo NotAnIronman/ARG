@@ -6,79 +6,111 @@
 <style>
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f2f2f2;
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+        background: #fff;
     }
+
+    /* TOP BAR */
     .topbar {
-        background: #2d2d2d;
-        color: white;
-        padding: 12px 20px;
-        font-size: 18px;
+        background: #f1f3f4;
+        border-bottom: 1px solid #dcdcdc;
+        padding: 8px 16px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
     }
+    .topbar-left {
+        font-size: 20px;
+        font-weight: 600;
+        color: #444;
+    }
+    .search-box {
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        padding: 6px 14px;
+        width: 300px;
+        color: #666;
+    }
+
+    /* LAYOUT */
     .sidebar {
-        width: 220px;
-        background: #ffffff;
+        width: 240px;
+        background: #fafafa;
+        border-right: 1px solid #ddd;
         height: calc(100vh - 50px);
-        border-right: 1px solid #ccc;
-        padding: 20px 10px;
-        box-sizing: border-box;
         float: left;
-    }
-    .sidebar h3 {
-        margin-top: 0;
-        font-size: 14px;
-        color: #555;
-        text-transform: uppercase;
+        padding: 20px 0;
     }
     .sidebar .folder {
-        padding: 8px 10px;
-        margin: 4px 0;
-        border-radius: 4px;
+        padding: 10px 24px;
+        font-size: 15px;
+        color: #444;
         cursor: pointer;
+    }
+    .sidebar .folder.unread {
+        font-weight: bold;
     }
     .sidebar .folder:hover {
-        background: #e6e6e6;
+        background: #e8eaed;
     }
+
     .main {
-        margin-left: 220px;
-        padding: 0;
+        margin-left: 240px;
+        height: calc(100vh - 50px);
+        display: flex;
+        flex-direction: row;
     }
+
+    /* EMAIL LIST */
     .email-list {
-        background: white;
-        border-bottom: 1px solid #ccc;
+        width: 360px;
+        border-right: 1px solid #ddd;
+        overflow-y: auto;
+        background: #fff;
     }
     .email-item {
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
+        padding: 14px 20px;
+        border-bottom: 1px solid #f0f0f0;
         cursor: pointer;
+        position: relative;
     }
     .email-item:hover {
-        background: #f9f9f9;
+        background: #f7f9fc;
     }
-    .email-item strong {
-        display: block;
-        font-size: 15px;
+    .email-item.unread strong {
+        font-weight: 700;
     }
+    .email-item .dot {
+        width: 10px;
+        height: 10px;
+        background: #1a73e8;
+        border-radius: 50%;
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* EMAIL CONTENT */
     .email-content {
-        padding: 20px;
-        background: white;
-        min-height: 300px;
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+        background: #fff;
     }
     .start-btn {
         display: inline-block;
         margin-top: 20px;
         padding: 10px 18px;
-        background: #0078d4;
+        background: #1a73e8;
         color: white;
         border-radius: 4px;
         text-decoration: none;
         font-weight: bold;
     }
     .start-btn:hover {
-        background: #005ea6;
+        background: #1558b0;
     }
 </style>
 </head>
@@ -86,60 +118,58 @@
 <body>
 
 <div class="topbar">
-    <div><strong>Secure Investigations Mail</strong></div>
-    <div>Agent: <em>New Recruit</em></div>
+    <div class="topbar-left">Secure Investigations Mail</div>
+    <input class="search-box" type="text" placeholder="Search mail">
 </div>
 
 <div class="sidebar">
-    <h3>Folders</h3>
-    <div class="folder" style="background:#e6f0ff;">Inbox (1)</div>
-    <div class="folder">Archive</div>
+    <div class="folder unread">Inbox (1)</div>
+    <div class="folder">Starred</div>
+    <div class="folder">Sent</div>
+    <div class="folder">Drafts</div>
     <div class="folder">Case Files</div>
     <div class="folder">Trash</div>
 </div>
 
 <div class="main">
     <div class="email-list">
-        <div class="email-item">
-            <strong>Welcome to the Investigation Unit</strong>
-            From: Command • Today
+        <div class="email-item unread">
+            <div class="dot"></div>
+            <strong>Welcome to the Investigation Unit</strong><br>
+            Command • Today
         </div>
     </div>
 
     <div class="email-content">
         <h2>Welcome, Investigator.</h2>
         <p>
-            You’ve been granted provisional access to the Secure Investigations Database.  
-            Your mission is simple: <strong>comb through the digital traces left behind and uncover the truth.</strong>
+            You are now logged into the Secure Investigations Mail System.  
+            This inbox contains all communications related to Case File <strong>Delta‑7</strong>.
         </p>
 
-        <h3>Your Role</h3>
+        <h3>Your Assignment</h3>
         <p>
-            You are the lead analyst assigned to Case File <strong>Delta‑7</strong>.  
-            The data you’ll encounter has been fragmented, mislabeled, or intentionally obscured.  
-            Your job is to piece it back together.
+            You will analyze messages, attachments, and digital fragments recovered from the case.  
+            Some will be straightforward. Others will be corrupted, mislabeled, or intentionally misleading.
         </p>
 
-        <h3>How to Proceed</h3>
+        <h3>How to Use This Inbox</h3>
         <ul>
-            <li>Open messages, attachments, and logs as they appear.</li>
-            <li>Follow clues — some obvious, some hidden.</li>
-            <li>Cross‑reference information across different “emails.”</li>
-            <li>Expect red herrings. Not everything wants to be found.</li>
-            <li>When in doubt, trust your instincts — and your curiosity.</li>
+            <li>Open emails as they appear — new ones may unlock as you progress.</li>
+            <li>Inspect attachments carefully; clues may be hidden in plain sight.</li>
+            <li>Cross‑reference information between messages.</li>
+            <li>Expect anomalies. The system may behave strangely.</li>
         </ul>
 
         <h3>Rules of Engagement</h3>
         <ul>
-            <li>Do not delete or alter evidence.</li>
-            <li>Do not share case materials outside the system.</li>
-            <li>Do not assume the sender of any message is who they claim to be.</li>
-            <li>Stay alert. The system may react to your actions.</li>
+            <li>Do not delete or modify evidence.</li>
+            <li>Do not trust sender names at face value.</li>
+            <li>Do not assume the system is stable.</li>
+            <li>Do not share case materials externally.</li>
         </ul>
 
-        <p>
-            When you're ready, your first assignment awaits.
-        </p>
+        <p>Your first task is waiting in your inbox.</p>
 
         <a class="start-btn" href="#start">Begin Investigation</a>
     </div>
