@@ -11,6 +11,5 @@ collections:
 
 # Don't process these folders as Jekyll content
 exclude:
-  - images/
   - data/
   - .github/
