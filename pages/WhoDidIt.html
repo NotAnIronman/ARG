@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,6 +42,13 @@ h1 {
   margin-top: 8px;
   letter-spacing: 1px;
 }
+.warning {
+  color: #c40000;
+  font-size: 12px;
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
 .suspects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -58,20 +64,21 @@ h1 {
   transition: border-color 0.15s, background 0.15s;
   user-select: none;
 }
-.suspect:hover:not(.voted) { background: #16202a; border-color: #4a6070; }
+.suspect:hover:not(.locked) { background: #16202a; border-color: #4a6070; }
 .suspect.selected {
   border: 2px solid #c40000;
   background: #1a0f10;
 }
 .suspect.selected::after {
-  content: "YOUR VOTE";
+  content: "YOUR SELECTION";
   position: absolute;
   top: 8px; right: 10px;
   font-size: 9px;
   letter-spacing: 2px;
   color: #c40000;
 }
-.suspect.voted { cursor: default; }
+.suspect.locked { cursor: default; }
+
 .suspect-name {
   font-size: 14px;
   font-weight: bold;
@@ -79,11 +86,13 @@ h1 {
   margin-bottom: 10px;
   letter-spacing: 1px;
 }
+
 .bar-wrap {
   background: #1a2530;
   height: 5px;
   width: 100%;
   margin-bottom: 6px;
+  visibility: hidden; /* hidden until vote */
 }
 .bar-fill {
   height: 5px;
@@ -91,13 +100,16 @@ h1 {
   transition: width 0.7s ease;
 }
 .suspect.selected .bar-fill { background: #c40000; }
+
 .vote-meta {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
   color: #556677;
   letter-spacing: 1px;
+  visibility: hidden; /* hidden until vote */
 }
+
 .footer {
   border-top: 1px solid #2b3a48;
   padding-top: 16px;
@@ -111,22 +123,14 @@ h1 {
   font-size: 11px;
   color: #556677;
   letter-spacing: 1px;
+  visibility: hidden;
 }
 .total-votes span { color: #7a8fa3; }
+
 .status { font-size: 11px; letter-spacing: 1px; color: #556677; }
 .status.ok  { color: #2e7a4e; }
 .status.err { color: #c40000; }
-.change-btn {
-  font-size: 11px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  color: #7a8fa3;
-  font-family: "Courier New", monospace;
-  text-decoration: underline;
-}
-.change-btn:hover { color: #c40000; }
+
 .loading-msg {
   text-align: center;
   padding: 60px 20px;
@@ -144,29 +148,30 @@ h1 {
     <div class="stamp">CLASSIFIED</div>
     <h1>Case File: Active Investigation</h1>
     <p class="subtitle">IDENTIFY THE PERPETRATOR — SELECT THE INDIVIDUAL YOU BELIEVE IS RESPONSIBLE</p>
+    <p class="warning">⚠ YOU ONLY GET ONE CHANCE — YOUR TESTIMONY CANNOT BE CHANGED</p>
   </div>
 
   <div id="app"><div class="loading-msg">ACCESSING CASE DATABASE<span>...</span></div></div>
 
   <div class="footer">
-    <div class="total-votes" id="total-wrap" style="visibility:hidden">TOTAL VOTES: <span id="total-count">0</span></div>
+    <div class="total-votes" id="total-wrap">TOTAL VOTES: <span id="total-count">0</span></div>
     <div class="status" id="status"></div>
-    <button class="change-btn" id="change-btn" style="display:none" onclick="changeVote()">[ REVISE TESTIMONY ]</button>
   </div>
 </div>
 
 <script>
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyC0TNF7BmaamcPHQKQsKcFnFPQoTwpWDgLOO06jVqY8zAeXbUPtY_vVYLzVvq--IT6/exec";
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 
 const SUSPECTS = [
+  "August"
   "Gustau",
-  "Nathan Bartholemew",
-  "Ricardo Saintiagoon",
-  "Patrick O'mallaghathy",
-  "Usain Holt",
-  "T Wing",
-  "Freedough",
+  "Nathan Barth",
+  "Richard Saint",
+  "Patricio Olivarez",
+  "Enrique Holst",
+  "Theodore Wing",
+  "Fred Dough",
   "Unknown Entity"
 ];
 // ─────────────────────────────────────────────────────────────────────────────
@@ -177,9 +182,10 @@ if (!userId) {
   localStorage.setItem("arg-uid", userId);
 }
 
-let userVote    = localStorage.getItem("arg-vote");
+let userVote = localStorage.getItem("arg-vote");
 let currentData = null;
-let busy        = false;
+let busy = false;
+let correctAnswer = null;
 
 function setStatus(msg, cls) {
   const el = document.getElementById("status");
@@ -187,50 +193,57 @@ function setStatus(msg, cls) {
   el.className = "status " + (cls || "");
 }
 
-// GET votes — plain fetch, Apps Script returns JSON
 async function loadVotes() {
   const res = await fetch(APPS_SCRIPT_URL + "?t=" + Date.now());
-  const json = await res.json();
-  return json; // { votes: { "Gustau": 3, ... } }
+  return await res.json(); // expects { votes: {...}, correct: "..." }
 }
 
-// POST vote — no-cors because Apps Script redirects trigger CORS preflight issues.
-// We fire-and-forget the POST, then poll the GET after a short delay.
 async function postVote(suspect) {
   await fetch(APPS_SCRIPT_URL, {
     method: "POST",
     mode: "no-cors",
-    headers: { "Content-Type": "text/plain" }, // text/plain skips preflight
+    headers: { "Content-Type": "text/plain" },
     body: JSON.stringify({ userId, suspect })
   });
 }
 
 async function castVote(suspect) {
-  if (busy) return;
+  if (busy || userVote) return;
+
+  const confirmVote = confirm(
+    "You only get ONE chance to identify the perpetrator.\n\n" +
+    "Once you submit your testimony, it cannot be changed.\n\n" +
+    "Confirm your selection: " + suspect
+  );
+  if (!confirmVote) return;
+
   busy = true;
   setStatus("TRANSMITTING...");
 
-  try {
-    await postVote(suspect);
-  } catch(e) {
-    // no-cors swallows errors; continue to poll
-  }
+  try { await postVote(suspect); } catch(e) {}
 
-  // Poll until the new vote appears (up to ~15s)
   let attempts = 0;
   const poll = setInterval(async () => {
     attempts++;
     try {
       const data = await loadVotes();
       const confirmed = (data.votes?.[suspect] || 0) > (currentData?.votes?.[suspect] || 0);
+
       if (confirmed || attempts >= 15) {
         clearInterval(poll);
+
         userVote = suspect;
         localStorage.setItem("arg-vote", suspect);
         currentData = data;
+        correctAnswer = data.correct;
         render(data);
-        setStatus("TESTIMONY RECORDED", "ok");
-        document.getElementById("change-btn").style.display = "";
+
+        if (suspect === correctAnswer) {
+          setStatus("CORRECT — YOU IDENTIFIED THE PERPETRATOR", "ok");
+        } else {
+          setStatus("INCORRECT — YOUR TESTIMONY HAS BEEN LOGGED", "err");
+        }
+
         busy = false;
       }
     } catch(e) {
@@ -243,19 +256,12 @@ async function castVote(suspect) {
   }, 1000);
 }
 
-function changeVote() {
-  userVote = null;
-  localStorage.removeItem("arg-vote");
-  setStatus("TESTIMONY CLEARED");
-  document.getElementById("change-btn").style.display = "none";
-  render(currentData);
-}
-
 function render(data) {
   const votes = data?.votes || {};
   const total = Object.values(votes).reduce((a, b) => a + b, 0);
+  correctAnswer = data.correct;
 
-  const sorted = [...SUSPECTS].sort((a, b) => (votes[b] || 0) - (votes[a] || 0));
+  const sorted = [...SUSPECTS];
 
   const app = document.getElementById("app");
   app.innerHTML = "";
@@ -264,58 +270,52 @@ function render(data) {
 
   sorted.forEach(name => {
     const count = votes[name] || 0;
-    const pct   = total > 0 ? Math.round((count / total) * 100) : 0;
+    const pct = total > 0 ? Math.round((count / total) * 100) : 0;
     const isMine = userVote === name;
 
     const div = document.createElement("div");
-    div.className = "suspect" + (isMine ? " selected" : "") + (userVote ? " voted" : "");
+    div.className = "suspect" + (isMine ? " selected" : "") + (userVote ? " locked" : "");
+
     div.innerHTML = `
       <div class="suspect-name">${name}</div>
-      <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
-      <div class="vote-meta">
+      <div class="bar-wrap" style="${userVote ? "visibility:visible" : ""}">
+        <div class="bar-fill" style="width:${pct}%"></div>
+      </div>
+      <div class="vote-meta" style="${userVote ? "visibility:visible" : ""}">
         <span>${count} VOTE${count !== 1 ? "S" : ""}</span>
         <span>${pct}%</span>
-      </div>`;
+      </div>
+    `;
 
     if (!userVote) div.onclick = () => castVote(name);
+
     grid.appendChild(div);
   });
 
   app.appendChild(grid);
+
   const tw = document.getElementById("total-wrap");
-  tw.style.visibility = "";
+  tw.style.visibility = userVote ? "visible" : "hidden";
   document.getElementById("total-count").textContent = total;
 }
 
-// Live poll every 8s
-let lastStr = "";
-async function livePoll() {
-  try {
-    const data = await loadVotes();
-    const str = JSON.stringify(data.votes);
-    if (str !== lastStr) {
-      lastStr = str;
-      currentData = data;
-      if (!busy) render(data);
-    }
-  } catch(e) {}
-}
-
-// Init
 (async () => {
   try {
     currentData = await loadVotes();
-    lastStr = JSON.stringify(currentData.votes);
+    correctAnswer = currentData.correct;
     render(currentData);
+
     if (userVote) {
-      setStatus("TESTIMONY ON FILE", "ok");
-      document.getElementById("change-btn").style.display = "";
+      if (userVote === correctAnswer) {
+        setStatus("CORRECT — YOU IDENTIFIED THE PERPETRATOR", "ok");
+      } else {
+        setStatus("INCORRECT — YOUR TESTIMONY HAS BEEN LOGGED", "err");
+      }
     }
   } catch(e) {
     document.getElementById("app").innerHTML =
       '<div class="loading-msg" style="color:#c40000">CONNECTION FAILED — CHECK SCRIPT URL</div>';
   }
-  setInterval(livePoll, 8000);
 })();
 </script>
 </body>
