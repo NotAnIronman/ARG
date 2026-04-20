@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secure Investigations Mail</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+    }
+    .topbar {
+        background: #2d2d2d;
+        color: white;
+        padding: 12px 20px;
+        font-size: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .sidebar {
+        width: 220px;
+        background: #ffffff;
+        height: calc(100vh - 50px);
+        border-right: 1px solid #ccc;
+        padding: 20px 10px;
+        box-sizing: border-box;
+        float: left;
+    }
+    .sidebar h3 {
+        margin-top: 0;
+        font-size: 14px;
+        color: #555;
+        text-transform: uppercase;
+    }
+    .sidebar .folder {
+        padding: 8px 10px;
+        margin: 4px 0;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .sidebar .folder:hover {
+        background: #e6e6e6;
+    }
+    .main {
+        margin-left: 220px;
+        padding: 0;
+    }
+    .email-list {
+        background: white;
+        border-bottom: 1px solid #ccc;
+    }
+    .email-item {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+    }
+    .email-item:hover {
+        background: #f9f9f9;
+    }
+    .email-item strong {
+        display: block;
+        font-size: 15px;
+    }
+    .email-content {
+        padding: 20px;
+        background: white;
+        min-height: 300px;
+    }
+    .start-btn {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 18px;
+        background: #0078d4;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .start-btn:hover {
+        background: #005ea6;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div><strong>Secure Investigations Mail</strong></div>
+    <div>Agent: <em>New Recruit</em></div>
+</div>
+
+<div class="sidebar">
+    <h3>Folders</h3>
+    <div class="folder" style="background:#e6f0ff;">Inbox (1)</div>
+    <div class="folder">Archive</div>
+    <div class="folder">Case Files</div>
+    <div class="folder">Trash</div>
+</div>
+
+<div class="main">
+    <div class="email-list">
+        <div class="email-item">
+            <strong>Welcome to the Investigation Unit</strong>
+            From: Command • Today
+        </div>
+    </div>
+
+    <div class="email-content">
+        <h2>Welcome, Investigator.</h2>
+        <p>
+            You’ve been granted provisional access to the Secure Investigations Database.  
+            Your mission is simple: <strong>comb through the digital traces left behind and uncover the truth.</strong>
+        </p>
+
+        <h3>Your Role</h3>
+        <p>
+            You are the lead analyst assigned to Case File <strong>Delta‑7</strong>.  
+            The data you’ll encounter has been fragmented, mislabeled, or intentionally obscured.  
+            Your job is to piece it back together.
+        </p>
+
+        <h3>How to Proceed</h3>
+        <ul>
+            <li>Open messages, attachments, and logs as they appear.</li>
+            <li>Follow clues — some obvious, some hidden.</li>
+            <li>Cross‑reference information across different “emails.”</li>
+            <li>Expect red herrings. Not everything wants to be found.</li>
+            <li>When in doubt, trust your instincts — and your curiosity.</li>
+        </ul>
+
+        <h3>Rules of Engagement</h3>
+        <ul>
+            <li>Do not delete or alter evidence.</li>
+            <li>Do not share case materials outside the system.</li>
+            <li>Do not assume the sender of any message is who they claim to be.</li>
+            <li>Stay alert. The system may react to your actions.</li>
+        </ul>
+
+        <p>
+            When you're ready, your first assignment awaits.
+        </p>
+
+        <a class="start-btn" href="#start">Begin Investigation</a>
+    </div>
+</div>
+
+</body>
+</html>
