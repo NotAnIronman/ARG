@@ -1,0 +1,3 @@
+Admin-level permissions list.
+Three active accounts at time of extraction.
+One account shows irregular activity.
