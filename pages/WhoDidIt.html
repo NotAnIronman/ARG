@@ -65,6 +65,7 @@ h1 {
   user-select: none;
 }
 .suspect:hover:not(.locked) { background: #16202a; border-color: #4a6070; }
+
 .suspect.selected {
   border: 2px solid #c40000;
   background: #1a0f10;
@@ -77,6 +78,20 @@ h1 {
   letter-spacing: 2px;
   color: #c40000;
 }
+
+.suspect.correct-answer {
+  border: 2px solid #2e7a4e !important;
+  background: #0f1a12;
+}
+.suspect.correct-answer::after {
+  content: "CORRECT PERPETRATOR";
+  position: absolute;
+  top: 8px; right: 10px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #2e7a4e;
+}
+
 .suspect.locked { cursor: default; }
 
 .suspect-name {
@@ -92,7 +107,7 @@ h1 {
   height: 5px;
   width: 100%;
   margin-bottom: 6px;
-  visibility: hidden; /* hidden until vote */
+  visibility: hidden;
 }
 .bar-fill {
   height: 5px;
@@ -107,7 +122,7 @@ h1 {
   font-size: 11px;
   color: #556677;
   letter-spacing: 1px;
-  visibility: hidden; /* hidden until vote */
+  visibility: hidden;
 }
 
 .footer {
@@ -195,7 +210,7 @@ function setStatus(msg, cls) {
 
 async function loadVotes() {
   const res = await fetch(APPS_SCRIPT_URL + "?t=" + Date.now());
-  return await res.json(); // expects { votes: {...}, correct: "..." }
+  return await res.json();
 }
 
 async function postVote(suspect) {
@@ -273,8 +288,14 @@ function render(data) {
     const pct = total > 0 ? Math.round((count / total) * 100) : 0;
     const isMine = userVote === name;
 
+    let classes = "suspect";
+
+    if (isMine) classes += " selected";
+    if (userVote) classes += " locked";
+    if (userVote && name === correctAnswer) classes += " correct-answer";
+
     const div = document.createElement("div");
-    div.className = "suspect" + (isMine ? " selected" : "") + (userVote ? " locked" : "");
+    div.className = classes;
 
     div.innerHTML = `
       <div class="suspect-name">${name}</div>
