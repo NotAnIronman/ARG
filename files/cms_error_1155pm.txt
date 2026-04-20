@@ -1,0 +1,4 @@
+CMS ERROR LOG — 23:55
+Render failure detected in article template.
+Error code: RENDER_FAIL_55
+No further details recorded.
